@@ -13,22 +13,22 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
+    - name: Set up Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    - name: Fix Apt Locks & Free Disk Space
-      run: |
-        sudo killall apt-get apt || true
-        sudo rm -f /var/lib/apt/lists/lock /var/cache/apt/archives/lock /var/lib/dpkg/lock*
-        sudo dpkg --configure -a
-
     - name: Install System Dependencies
       run: |
         sudo apt-get update || true
         sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -f \
-          git zip unzip openjdk-17-jdk python3-pip autoconf libtool \
+          git zip unzip python3-pip autoconf libtool \
           pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 \
           cmake libffi-dev libssl-dev ccache
 
@@ -37,7 +37,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install "cython<3.0.0" buildozer
 
-    - name: Build APK with Buildozer
+    - name: Build APK with Pre-installed SDK
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/25.2.9519653
       run: |
         buildozer -v android debug
 
