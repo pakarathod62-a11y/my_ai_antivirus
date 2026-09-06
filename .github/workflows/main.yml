@@ -7,21 +7,42 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    - name: Build Android APK with Buildozer Action
-      uses: ArtemSBulgakov/buildozer-action@v1
-      id: buildozer
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        command: buildozer android debug
-        buildozer_version: stable
+        python-version: '3.10'
+
+    - name: Free Disk Space & Fix Locks
+      run: |
+        sudo killall apt-get apt || true
+        sudo rm -f /var/lib/apt/lists/lock /var/cache/apt/archives/lock /var/lib/dpkg/lock*
+        sudo dpkg --configure -a
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+          git zip unzip openjdk-17-jdk python3-pip autoconf libtool \
+          pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 \
+          cmake libffi-dev libssl-dev ccache
+
+    - name: Install Buildozer & Cython
+      run: |
+        python -m pip install --upgrade pip
+        pip install "cython<3.0.0" buildozer
+
+    - name: Build APK with Buildozer
+      run: |
+        yes | buildozer -v android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: my-ai-antivirus-apk
-        path: ${{ steps.buildozer.outputs.filename }}
+        path: bin/*.apk
