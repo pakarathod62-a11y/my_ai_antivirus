@@ -1,0 +1,9 @@
+antivirus_env/
+fresh_env/
+dataset.csv
+.buildozer/
+.quarantine/
+bin/
+*.deb
+*.zip
+.cache/

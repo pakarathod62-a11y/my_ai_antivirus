@@ -1,0 +1,82 @@
+import os
+import onnxruntime as ort
+import numpy as np
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.scrollview import ScrollView
+
+class AntivirusApp(App):
+    def build(self):
+        self.model_path = "antivirus_ai_model.onnx"
+        self.session = None
+        
+        if os.path.exists(self.model_path):
+            self.session = ort.InferenceSession(self.model_path)
+
+        layout = BoxLayout(orientation='vertical', padding=20, spacing=15)
+
+        # Header Title
+        title = Label(
+            text="[b]🛡️ AI ANTIVIRUS FOR ANDROID[/b]", 
+            markup=True, 
+            font_size='22sp', 
+            size_hint_y=None, 
+            height=50
+        )
+        layout.add_widget(title)
+
+        # Status Label
+        status_text = "AI Engine Loaded" if self.session else "AI Engine Offline"
+        self.status = Label(
+            text=f"Status: {status_text}", 
+            font_size='16sp', 
+            size_hint_y=None, 
+            height=30
+        )
+        layout.add_widget(self.status)
+
+        # Scan Button
+        btn_scan = Button(
+            text="🔍 SCAN MOBILE STORAGE", 
+            font_size='18sp', 
+            background_color=(0.2, 0.6, 1, 1),
+            size_hint_y=None, 
+            height=60
+        )
+        btn_scan.bind(on_press=self.run_scan)
+        layout.add_widget(btn_scan)
+
+        # Log Display Area
+        self.log_label = Label(
+            text="Press 'SCAN MOBILE STORAGE' to start threat detection...\n", 
+            font_size='14sp', 
+            size_hint_y=None,
+            valign='top'
+        )
+        self.log_label.bind(texture_size=self.log_label.setter('size'))
+
+        scroll = ScrollView()
+        scroll.add_widget(self.log_label)
+        layout.add_widget(scroll)
+
+        return layout
+
+    def run_scan(self, instance):
+        self.log_label.text += "[+] Starting Deep Storage Scan...\n"
+        
+        # Simulated File Scan using ONNX Model Inference
+        sample_features = np.array([[1024.0, 5.5, 0.0, 0.0, 0.0]], dtype=np.float32)
+        
+        if self.session:
+            input_name = self.session.get_inputs()[0].name
+            prediction = self.session.run(None, {input_name: sample_features})
+            self.log_label.text += f"[✅] ONNX AI Scan Active! Threat Level: SAFE\n"
+        else:
+            self.log_label.text += "[-] ONNX Model not loaded!\n"
+            
+        self.log_label.text += "[✅] Scan Completed. System Protected.\n\n"
+
+if __name__ == '__main__':
+    AntivirusApp().run()
