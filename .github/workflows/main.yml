@@ -18,7 +18,7 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Free Disk Space & Fix Locks
+    - name: Fix Apt Locks & Free Disk Space
       run: |
         sudo killall apt-get apt || true
         sudo rm -f /var/lib/apt/lists/lock /var/cache/apt/archives/lock /var/lib/dpkg/lock*
@@ -26,8 +26,8 @@ jobs:
 
     - name: Install System Dependencies
       run: |
-        sudo apt-get update
-        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        sudo apt-get update || true
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -f \
           git zip unzip openjdk-17-jdk python3-pip autoconf libtool \
           pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 \
           cmake libffi-dev libssl-dev ccache
