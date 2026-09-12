@@ -6,7 +6,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
-requirements = python3==3.11.5,kivy
+requirements = python3,kivy,android
 
 orientation = portrait
 osx.kivy_version = 1.9.1
