@@ -7,7 +7,6 @@ source.include_exts = py,png,jpg,kv,atlas
 version = 0.1
 
 requirements = python3,kivy,android
-p4a.branch = 2024.1.21
 
 orientation = portrait
 osx.kivy_version = 1.9.1
